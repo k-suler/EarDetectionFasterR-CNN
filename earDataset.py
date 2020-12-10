@@ -47,11 +47,15 @@ class EarDataset(object):
         img = Image.open(img_path).convert("RGB")
 
         mask = cv.imread(cv.samples.findFile(mask_path))
-
+        b, g, r = cv.split(mask)
+        r = r * 255
+        g = g * 255
+        b = b * 255
+        mask = cv.merge((r, g, b))
         mask = cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
-        # src_gray = cv.blur(src_gray, (3, 3))
+        mask = cv.blur(mask, (3, 3))
 
-        thresh = 1  # initial threshold
+        thresh = 255  # initial threshold
         boxes = self.thresh_callback(thresh, mask)
 
         # convert everything into a torch.Tensor

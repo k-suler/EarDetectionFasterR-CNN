@@ -20,7 +20,7 @@ def thresh_callback(val):
     centers = [None] * len(contours)
     radius = [None] * len(contours)
     for i, c in enumerate(contours):
-        contours_poly[i] = cv.approxPolyDP(c, 1, True)
+        contours_poly[i] = cv.approxPolyDP(c, 3, True)
         boundRect[i] = cv.boundingRect(contours_poly[i])
         centers[i], radius[i] = cv.minEnclosingCircle(contours_poly[i])
 
@@ -41,9 +41,9 @@ def thresh_callback(val):
             color,
             2,
         )
-        cv.circle(
-            drawing, (int(centers[i][0]), int(centers[i][1])), int(radius[i]), color, 2
-        )
+        # cv.circle(
+        #     drawing, (int(centers[i][0]), int(centers[i][1])), int(radius[i]), color, 2
+        # )
 
     cv.imshow('Contours', drawing)
 
@@ -54,10 +54,15 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '--input',
     help='Path to input image.',
-    default='AWEForSegmentation/testannot/0017.png',
+    default='AWEForSegmentation/testannot/0005.png',
 )
 args = parser.parse_args()
 src = cv.imread(cv.samples.findFile(args.input))
+b, g, r = cv.split(src)
+r = r * 255
+g = g * 255
+b = b * 255
+src = cv.merge((r, g, b))
 if src is None:
     print('Could not open or find the image:', args.input)
     exit(0)
@@ -80,16 +85,17 @@ def threshold_slow(T, image):
 
 # Convert image to gray and blur it
 src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+cv.split(src)
 # src_gray = threshold_slow(1, src_gray)
 src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-# src_gray = cv.blur(src_gray, (3, 3))
+src_gray = cv.blur(src_gray, (3, 3))
 # plt.imshow(src_gray, cmap="gray")
 
 source_window = 'Source'
 cv.namedWindow(source_window)
 cv.imshow(source_window, src)
 max_thresh = 255
-thresh = 1  # initial threshold
+thresh = 2  # initial threshold
 cv.createTrackbar('Canny thresh:', source_window, thresh, max_thresh, thresh_callback)
 thresh_callback(thresh)
 cv.waitKey()

@@ -103,7 +103,7 @@ def main():
     # get the model using our helper function
     # move model to the right device
     model.to(device)
-    # evaluate(model, data_loader_test, device=device)
+    evaluate(model, data_loader_test, device=device)
     x = []
     ro = []
     for img, target in dataset_test:
